@@ -30,22 +30,32 @@ wxEND_EVENT_TABLE()
 LoginFrame::LoginFrame(const wxString& title)
     : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(500, 300))
 {
-    wxPanel* panel = new wxPanel(this, wxID_ANY);
 
-    wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+wxPanel* panel = new wxPanel(this, wxID_ANY);
+wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
 
-    // Header Image
-    wxBitmap headerBitmap(wxT("welcome-header.png"), wxBITMAP_TYPE_PNG);
-    if (headerBitmap.IsOk())
-    {
-        wxStaticBitmap* headerImage = new wxStaticBitmap(panel, wxID_ANY, headerBitmap);
-        vbox->Add(headerImage, 0, wxALIGN_CENTER | wxALL, 10);
-    }
-    else
-    {
-        wxMessageBox("Failed to load image file.", "Error", wxOK | wxICON_ERROR);
-    }
+// Register PNG image handler
+wxImage::AddHandler(new wxPNGHandler);
 
+// Header Image
+wxImage headerImage(wxT("welcome-header.png"), wxBITMAP_TYPE_PNG);
+if (headerImage.IsOk())
+{
+    // Adjust the desired width and height for the image
+    int imageWidth = 400;
+    int imageHeight = 100;
+
+    // Resize the image
+    headerImage.Rescale(imageWidth, imageHeight);
+
+    wxBitmap headerBitmap(headerImage);
+    wxStaticBitmap* headerImageCtrl = new wxStaticBitmap(panel, wxID_ANY, headerBitmap);
+    vbox->Add(headerImageCtrl, 0, wxALIGN_CENTER | wxALL, 10);
+}
+else
+{
+    wxMessageBox("Failed to load image file.", "Error", wxOK | wxICON_ERROR);
+}
     // Welcome Text
     wxString welcomeText = "Selamat datang di sistem informasi akademik Institut Teknologi Komputer.\nSilakan gunakan surel berdomain 'dosen', 'students', atau 'tendik' untuk masuk.";
     wxStaticText* welcomeLabel = new wxStaticText(panel, wxID_ANY, welcomeText, wxDefaultPosition, wxDefaultSize, wxALIGN_CENTER_HORIZONTAL);
@@ -79,7 +89,8 @@ LoginFrame::LoginFrame(const wxString& title)
 }
 
 void LoginFrame::OnLogin(wxCommandEvent& event)
-{
+{  
+    
     wxString email = emailTextCtrl->GetValue();
 
     if (email.Contains("students"))
@@ -125,6 +136,7 @@ public:
 bool LoginApp::OnInit()
 {
     LoginFrame* frame = new LoginFrame("Login");
+    frame->SetSize(wxSize(600, 400));
     frame->Show(true);
     return true;
 }
